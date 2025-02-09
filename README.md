@@ -113,7 +113,7 @@ You can manually convert one data type to another using type casting functions.
 
 ---
 
-### Notes:
+### Summary:
 - **Implicit type casting**: Happens automatically when there’s no risk of data loss. For example, converting an `int` to a `float`.
 - **Explicit type casting**: Done manually to convert between types when needed. Can result in loss of precision (e.g., converting a float to an int).
 - **TypeError**: Be cautious, as Python will raise a `TypeError` if the conversion is not possible (e.g., trying to convert a non-numeric string to an `int`).
