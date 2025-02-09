@@ -119,5 +119,3 @@ You can manually convert one data type to another using type casting functions.
 - **TypeError**: Be cautious, as Python will raise a `TypeError` if the conversion is not possible (e.g., trying to convert a non-numeric string to an `int`).
 
 ---
-
-This should give you a clear understanding of type casting in Python! Let me know if you need more details or examples.
