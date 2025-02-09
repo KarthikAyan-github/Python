@@ -120,7 +120,7 @@ You can manually convert one data type to another using type casting functions.
 
 ---
 
-### Python Indexing:
+# Python Indexing:
 
 Indexing in Python refers to accessing the elements of an ordered collection (like a list, tuple, string, etc.) using an index. Python supports both positive and negative indexing.
 
@@ -232,7 +232,7 @@ print(my_list[::2])  # Output: [10, 30, 50] (every second element)
 
 ---
 
-### Built-in Functions & Methods:
+# Built-in Functions & Methods:
 
 There are many **built-in functions** and **methods** that are used frequently across various types of applications. Below is a list of the most commonly used built-in methods and functions in Python, categorized by data type:
 
