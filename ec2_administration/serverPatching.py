@@ -35,7 +35,50 @@ def getInstances():
                         logging.info('{} is skipped due to no patching tag..'.format(server["InstanceId"]))
                 else:
                     logging.info(f'{server["InstanceId"]} is in {instnaceState['Name']} state..')
-        ssmConnectionCheck(instanceSet,region)                          
+        ssmConnectionCheck(instanceSet,region)
+
+def ssmConnectionCheck(instances,region):
+    ssm = boto3.client('ssm', region_name=region)
+    validInstanceSet = set()
+    invalidInstanceSet = set()
+    for instance in instances:
+        response = ssm.describe_instance_information()
+        if response['InstanceInformationList']:
+            validInstanceSet.add(instance) 
+        else:
+            invalidInstanceSet.add(instance)
+            logging.info(f"{instance} SSM is not worinking | {region}")
+    initiatePatchBaseLine(ssm, validInstanceSet, region)  
+
+def initiatePatchBaseLine(ssm, instances, region):
+    if instances:
+        userAction = input("what you want to perform scan/install: ")
+        userAction = userAction.capitalize()
+        if userAction == 'Scan' or userAction == 'Install':
+            comment = 'Initiating patch {} from python'.format(userAction)
+            print(comment)
+            response = ssm.send_command(
+            InstanceIds = list(instances),
+            DocumentName ="AWS-RunPatchBaseline",
+            TimeoutSeconds=1800,
+            Parameters = {
+            'Operation': [userAction]},
+            Comment = comment,
+            )
+            commandID = response['Command']['CommandId']
+            logging.info (f"Initiating patch {response['Command']['Parameters']['Operation'][0]} with Command ID: {commandID} in {region} region")
+            for instance in response['Command']['InstanceIds']:
+                time.sleep(5)
+                while True:
+                    instanceStatus = ssm.list_command_invocations(
+                        CommandId = commandID,
+                        InstanceId = instance,
+                        Details=True)
+                    terminator = states(instance, instanceStatus['CommandInvocations'][0]['StatusDetails'])
+                    if terminator == 'done':
+                        break
+        else:
+            print("Unsupported Operation Please enter 'scan' or 'install' only")
 
 def states(instance, actualStatus):
     if actualStatus == 'Pending':
@@ -58,45 +101,8 @@ def states(instance, actualStatus):
         logging.critical(f"{instance} is {actualStatus}:")
         logging.critical("Command execution started on the managed node, but the execution wasn't complete before the execution timeout expired.")
         return "done" 
-    
-def initiatePatchBaseLine(ssm, instances, region):
-    if instances:
-        response = ssm.send_command(
-        InstanceIds= list(instances),
-        DocumentName="AWS-RunPatchBaseline",
-        Parameters={
-        'Operation': ['Scan']},
-        Comment='Initiating Scan from python',
-        )
-        commandID = response['Command']['CommandId']
-        logging.info (f"Initiating patch {response['Command']['Parameters']['Operation'][0]} with Command ID: {commandID} in {region} region")
-        for instance in response['Command']['InstanceIds']:
-            time.sleep(5)
-            while True:
-                instanceStatus = ssm.list_command_invocations(
-                    CommandId = commandID,
-                    InstanceId = instance,
-                    Details=True)
-                terminator = states(instance, instanceStatus['CommandInvocations'][0]['StatusDetails'])
-                if terminator == 'done':
-                    break
-
-def ssmConnectionCheck(instances,region):
-    ssm = boto3.client('ssm', region_name=region)
-    validInstanceSet = set()
-    invalidInstanceSet = set()
-    for instance in instances:
-        response = ssm.describe_instance_information()
-        if response['InstanceInformationList']:
-            validInstanceSet.add(instance) 
-        else:
-            invalidInstanceSet.add(instance)
-            logging.info(f"{instance} SSM is not worinking | {region}")
-    initiatePatchBaseLine(ssm, validInstanceSet, region)    
 
 def main():
     getInstances()
 
 main()
-                  
- 
