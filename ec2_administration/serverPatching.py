@@ -1,5 +1,6 @@
 import boto3
 import logging
+import time
 
 ec2=boto3.client('ec2')
 logging.basicConfig(encoding='utf-8', level=logging.INFO)
@@ -36,9 +37,30 @@ def getInstances():
                     logging.info(f'{server["InstanceId"]} is in {instnaceState['Name']} state..')
         ssmConnectionCheck(instanceSet,region)                          
 
-def initiatePatchBaseLine(instances, region):
+def states(instance, actualStatus):
+    if actualStatus == 'Pending':
+        logging.info(f"{instance} is {actualStatus}: The command hasn't been sent to the server.")
+        time.sleep(5)
+    elif actualStatus == 'InProgress':
+        logging.info(f"{instance} is {actualStatus}.")
+        time.sleep(10)
+    elif actualStatus == 'Delayed':
+        logging.warning(f"{instance} is {actualStatus}:") 
+        logging.warning("The system attempted to send the command to the managed node but wasn't successful. The system retries again.")  
+        time.sleep(10)
+    elif actualStatus == 'Success':
+        logging.info(f"{instance} is {actualStatus}.")
+        return "done"          
+    elif actualStatus == 'Cancelled':
+        logging.info(f"{instance} is {actualStatus}.")
+        return "done" 
+    elif actualStatus == 'TimedOut':
+        logging.critical(f"{instance} is {actualStatus}:")
+        logging.critical("Command execution started on the managed node, but the execution wasn't complete before the execution timeout expired.")
+        return "done" 
+    
+def initiatePatchBaseLine(ssm, instances, region):
     if instances:
-        ssm = boto3.client('ssm', region_name=region)
         response = ssm.send_command(
         InstanceIds= list(instances),
         DocumentName="AWS-RunPatchBaseline",
@@ -46,9 +68,18 @@ def initiatePatchBaseLine(instances, region):
         'Operation': ['Scan']},
         Comment='Initiating Scan from python',
         )
-        logging.info ("Initiating patch scan for: \n")
+        commandID = response['Command']['CommandId']
+        logging.info (f"Initiating patch {response['Command']['Parameters']['Operation'][0]} with Command ID: {commandID} in {region} region")
         for instance in response['Command']['InstanceIds']:
-            logging.info(f"{instance} command ID is {response['Command']['CommandId']}")
+            time.sleep(5)
+            while True:
+                instanceStatus = ssm.list_command_invocations(
+                    CommandId = commandID,
+                    InstanceId = instance,
+                    Details=True)
+                terminator = states(instance, instanceStatus['CommandInvocations'][0]['StatusDetails'])
+                if terminator == 'done':
+                    break
 
 def ssmConnectionCheck(instances,region):
     ssm = boto3.client('ssm', region_name=region)
@@ -61,12 +92,11 @@ def ssmConnectionCheck(instances,region):
         else:
             invalidInstanceSet.add(instance)
             logging.info(f"{instance} SSM is not worinking | {region}")
-    initiatePatchBaseLine(validInstanceSet, region)    
-
+    initiatePatchBaseLine(ssm, validInstanceSet, region)    
 
 def main():
     getInstances()
-    
+
 main()
                   
  
