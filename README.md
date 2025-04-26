@@ -443,11 +443,6 @@ Sets are collections of unique items and are useful when you need to store non-d
   ```
 
 ---
-Got it!  
-I'll **add "Abstraction"** properly, **improve the existing OOP features' definitions**, and **include** your points about **class and object**.  
-I'll keep it simple, correct, and beginner-friendly. Here's the **updated and improved** version:
-
----
 
 # Programming Paradigms
 
@@ -624,3 +619,299 @@ I'll keep it simple, correct, and beginner-friendly. Here's the **updated and im
 
   file.close()
   ```
+---
+
+# Errors and Error Handling in Python
+
+## What are Errors?
+
+- **Errors** are problems that occur while running a program.
+- If not handled, errors can cause the program to **crash**.
+
+---
+
+## Types of Errors
+
+1. **Syntax Errors**:
+   - Errors due to wrong Python syntax.
+   - Program won't even start running until the syntax is corrected.
+   - **Example**:
+     ```python
+     if True
+         print("Hello")
+     ```
+     (Missing `:` after `if True`)
+
+2. **Runtime Errors**:
+   - Errors that occur **while the program is running**.
+   - Syntax is correct, but some operation fails during execution.
+   - **Example**:
+     ```python
+     print(10 / 0)  # Division by zero error
+     ```
+
+3. **Logical Errors**:
+   - The program runs without crashing but **produces wrong results**.
+   - These are **hard to detect** because the code looks fine.
+   - **Example**:
+     ```python
+     # Intention was to add numbers, but code multiplies
+     def add(a, b):
+         return a * b
+     print(add(2, 3))  # Wrong output: 6 instead of 5
+     ```
+
+---
+
+## Error Handling in Python
+
+- To **handle** errors and prevent program crashes, Python provides the **try-except** block.
+
+---
+
+### Syntax:
+
+```python
+try:
+    # Code that may cause an error
+except ErrorType:
+    # Code to handle the error
+```
+
+- **try** block:  
+  - Write the code that might throw an error.
+- **except** block:  
+  - Write how you want to **handle** the error.
+
+---
+
+## Example: Handling Division by Zero
+
+```python
+try:
+    a = int(input("Enter a number: "))
+    result = 10 / a
+    print("Result:", result)
+except ZeroDivisionError:
+    print("You cannot divide by zero!")
+except ValueError:
+    print("Invalid input! Please enter a number.")
+```
+
+**Output**:
+
+```
+Enter a number: 0
+You cannot divide by zero!
+```
+
+or
+
+```
+Enter a number: abc
+Invalid input! Please enter a number.
+```
+
+---
+
+## Catching All Errors (Not Recommended)
+
+- You can catch all errors using a general `except` block, but it's **better to catch specific errors**.
+
+```python
+try:
+    # risky code
+except Exception as e:
+    print("Error occurred:", e)
+```
+
+---
+
+# Best Practices for Error Handling
+
+✅ Catch **specific exceptions** instead of using a generic `Exception`.  
+✅ Keep the `try` block **as small as possible** (only risky code inside).  
+✅ Provide **useful error messages** for better debugging.  
+✅ Don't silently ignore errors — **log them** or **handle properly**.
+
+---
+
+## What is a Method?
+
+- A **method** is a **function inside a class** that works with the object’s data.
+- It is used to **define the behavior** of objects.
+
+✅ **In short**:  
+- Methods are **actions** that objects can perform.
+
+---
+
+### Syntax:
+
+```python
+class ClassName:
+    def method_name(self, parameters):
+        # method body
+```
+
+- `self` refers to the object calling the method.
+
+---
+
+### Example:
+
+```python
+class Dog:
+    def __init__(self, name):
+        self.name = name
+
+    def bark(self):
+        print(f"{self.name} says Woof!")
+
+# Create Object
+dog1 = Dog("Buddy")
+dog1.bark()  # Output: Buddy says Woof!
+```
+
+---
+
+## Types of Methods
+
+| 🔹 Type | 🔹 Purpose | 🔹 Syntax Example |
+|:---|:---|:---|
+| Instance Methods | Work with instance (object) attributes | `def method(self):` |
+| Class Methods | Work with class itself (shared across all objects) | `@classmethod` |
+| Static Methods | Utility methods, not dependent on instance or class | `@staticmethod` |
+
+---
+
+### Example of Class Method and Static Method:
+
+```python
+class School:
+    school_name = "ABC High School"
+
+    def __init__(self, student_name):
+        self.student_name = student_name
+
+    @classmethod
+    def get_school_name(cls):
+        return cls.school_name
+
+    @staticmethod
+    def is_open(day):
+        return day.lower() != "sunday"
+
+# Using methods
+student = School("John")
+print(student.get_school_name())   # Class Method
+print(School.is_open("Monday"))     # Static Method
+```
+
+---
+
+✅ **Quick Summary**
+
+| Concept | Meaning |
+|:---|:---|
+| Class | Blueprint for creating objects |
+| Object | Instance (real) of a class |
+| Method | Function inside a class working with objects |
+
+---
+
+# Constructor in Python
+
+## What is a Constructor?
+
+- A **constructor** is a special **method** in a class that **automatically runs** when an **object** is created.
+- It is mainly used to **initialize** the object’s **attributes** (variables).
+
+---
+
+## Constructor Method: `__init__()`
+
+- In Python, the constructor is called **`__init__()`**.
+- It is **automatically called** when a new object is created from a class.
+
+---
+
+### Syntax:
+
+```python
+class ClassName:
+    def __init__(self, parameters):
+        # Initialize attributes
+```
+
+- `self`:  
+  Refers to the **current object** being created.
+- Other parameters are used to pass **initial values** for object attributes.
+
+---
+
+### Example:
+
+```python
+class Person:
+    def __init__(self, name, age):
+        self.name = name  # attribute
+        self.age = age    # attribute
+
+    def display(self):
+        print(f"Name: {self.name}, Age: {self.age}")
+
+# Create object
+p1 = Person("John", 25)
+p1.display()
+```
+
+**Output**:
+```
+Name: John, Age: 25
+```
+
+---
+
+## Key Points:
+
+| 🔹 Feature | 🔹 Description |
+|:---|:---|
+| Name | Always `__init__()` |
+| Purpose | Initialize object attributes |
+| Called Automatically | When creating an object |
+| `self` | Refers to the current instance of the class |
+
+---
+
+## Types of Constructors (Conceptually)
+
+1. **Default Constructor**:
+   - A constructor with **no parameters** (except `self`).
+   - Initializes object with default values.
+   - **Example**:
+     ```python
+     class Car:
+         def __init__(self):
+             self.brand = "Toyota"
+     car1 = Car()
+     print(car1.brand)
+     ```
+
+2. **Parameterized Constructor**:
+   - A constructor that **accepts parameters** to initialize attributes with different values.
+   - **Example**:
+     ```python
+     class Car:
+         def __init__(self, brand):
+             self.brand = brand
+     car1 = Car("Tesla")
+     print(car1.brand)
+     ```
+
+---
+
+✅ **In simple words**:  
+- A **constructor** is like **setting up everything** when you build a new house (object)!
+- You don't have to call it manually — Python does it for you the moment you create an object.
+
