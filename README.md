@@ -915,3 +915,73 @@ Name: John, Age: 25
 - A **constructor** is like **setting up everything** when you build a new house (object)!
 - You don't have to call it manually — Python does it for you the moment you create an object.
 
+---
+
+# 📚 Access Modifiers in Python (Variables)
+
+In Object-Oriented Programming (OOP), **access modifiers** decide:
+> **Who can access a variable or method?**
+
+✅ In Python, there are **3 types** (not 4 like Java/C++).
+
+| Modifier | Syntax | Meaning |
+|:---|:---|:---|
+| Public | `variable_name` | Accessible from anywhere |
+| Protected | `_variable_name` | Should not be accessed outside the class (but still possible) |
+| Private | `__variable_name` | Name mangled → Not directly accessible outside |
+
+---
+
+# 🎯 Explanation with Example
+
+```python
+class Student:
+    def __init__(self):
+        self.name = "Karthik"         # public variable
+        self._course = "DevOps"        # protected variable
+        self.__password = "secret123"  # private variable
+
+# Create object
+s1 = Student()
+
+# Public variable → accessible
+print(s1.name)        # Output: Karthik
+
+# Protected variable → accessible but not recommended
+print(s1._course)     # Output: DevOps
+
+# Private variable → NOT directly accessible
+# print(s1.__password)  # ❌ Error: AttributeError
+
+# But technically, you can access private by name mangling
+print(s1._Student__password)  # Output: secret123
+```
+
+---
+
+# 🔵 Quick Meaning of Each
+
+| Type | Rule | Practical Meaning |
+|:---|:---|:---|
+| **Public** | No underscore | Free to access |
+| **Protected** | Single underscore `_` | Meant for **internal use** inside class/subclasses |
+| **Private** | Double underscore `__` | Meant to be **fully hidden**, needs special way to access |
+
+---
+
+# 📢 Important:
+
+✅ Python **doesn't enforce strict access** like Java or C++.  
+✅ It uses a **gentleman's agreement** → "We trust you to respect it."
+
+Meaning:  
+- **_protected** → "please don't touch it unless needed."
+- **__private** → "really please don't touch unless you know what you are doing."
+
+---
+
+# 📢 Important Note:
+
+- In Python **there is no "default" access modifier**.
+- "Default" concept exists in **Java**, not Python.
+- In Python, if you **don't use underscore**, it is **Public** by default.
